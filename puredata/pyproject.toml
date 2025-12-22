@@ -1,11 +1,21 @@
 [project]
 name = "puredata"
 version = "0.1.0"
-description = "PureData using crewAI"
-authors = [{ name = "Your Name", email = "you@example.com" }]
+description = "PureData using CrewAI"
+readme = "README.md"
 requires-python = ">=3.10,<3.14"
+authors = [{ name = "Samad Khan" }]
+
+
 dependencies = [
-    "crewai[tools]==1.7.1"
+  "crewai==1.7.1",
+  "langchain>=0.3,<2",
+  "langchain-community>=0.3,<2",
+  "langchain-openai==0.2.14",
+  "openai>=1.0,<3",
+  "python-dotenv>=1.0,<2",
+  "pandas>=2.0,<3",
+  "lxml>=5.0,<7",
 ]
 
 [project.scripts]
@@ -16,9 +26,23 @@ replay = "puredata.main:replay"
 test = "puredata.main:test"
 run_with_trigger = "puredata.main:run_with_trigger"
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.crewai]
 type = "crew"
+
+[tool.pyright]
+useLibraryCodeForTypes = true
+exclude = [".cache", ".venv"]
+
+[tool.ruff]
+select = ["E", "W", "F", "I", "B", "C4", "ARG", "SIM"]
+ignore = ["W291", "W292", "W293"]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"

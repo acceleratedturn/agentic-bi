@@ -1,94 +1,46 @@
-#!/usr/bin/env python
-import sys
-import warnings
+import os
+from crewai import Crew
 
-from datetime import datetime
-
-from puredata.crew import Puredata
-
-warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
-
-# This main file is intended to be a way for you to run your
-# crew locally, so refrain from adding unnecessary logic into this file.
-# Replace with inputs you want to test with, it will automatically
-# interpolate any tasks and agents information
-
-def run():
-    """
-    Run the crew.
-    """
-    inputs = {
-        'topic': 'AI LLMs',
-        'current_year': str(datetime.now().year)
-    }
-
-    try:
-        Puredata().crew().kickoff(inputs=inputs)
-    except Exception as e:
-        raise Exception(f"An error occurred while running the crew: {e}")
+from textwrap import dedent
+from .config.agents import DataAgents
+from .tasks import Tasks
 
 
-def train():
-    """
-    Train the crew for a given number of iterations.
-    """
-    inputs = {
-        "topic": "AI LLMs",
-        'current_year': str(datetime.now().year)
-    }
-    try:
-        Puredata().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
+class DataCrew:
+    def __init__(self, target_columns, Data_File_Path):
+        self.target_columns = target_columns
+        self.Data_File_Path = Data_File_Path
 
-    except Exception as e:
-        raise Exception(f"An error occurred while training the crew: {e}")
+    def run(self):
+        # agents and tasks imports
+        agents = DataAgents()
+        tasks = Tasks()
 
-def replay():
-    """
-    Replay the crew execution from a specific task.
-    """
-    try:
-        Puredata().crew().replay(task_id=sys.argv[1])
+        # Agent Definition
+        engineer = agents.engineer()
+        analyst = agents.analyst()
+        scientist = agents.scientist()
 
-    except Exception as e:
-        raise Exception(f"An error occurred while replaying the crew: {e}")
+        # Task Defintion
+        IngestingData = tasks.ingest_and_clean_data(
+            engineer,
+            self.target_columns,
+            self.Data_File_Path,
+        )
 
-def test():
-    """
-    Test the crew execution and returns the results.
-    """
-    inputs = {
-        "topic": "AI LLMs",
-        "current_year": str(datetime.now().year)
-    }
-
-    try:
-        Puredata().crew().test(n_iterations=int(sys.argv[1]), eval_llm=sys.argv[2], inputs=inputs)
-
-    except Exception as e:
-        raise Exception(f"An error occurred while testing the crew: {e}")
-
-def run_with_trigger():
-    """
-    Run the crew with trigger payload.
-    """
-    import json
-
-    if len(sys.argv) < 2:
-        raise Exception("No trigger payload provided. Please provide JSON payload as argument.")
-
-    try:
-        trigger_payload = json.loads(sys.argv[1])
-    except json.JSONDecodeError:
-        raise Exception("Invalid JSON payload provided as argument")
-
-    inputs = {
-        "crewai_trigger_payload": trigger_payload,
-        "topic": "",
-        "current_year": ""
-    }
-
-    try:
-        result = Puredata().crew().kickoff(inputs=inputs)
+        # Crew Definition
+        crew = Crew(
+            agents=[engineer], # Update all agents here
+            tasks=[IngestingData], # Update Tasks here
+            verbose=True,
+        )
+        result = crew.kickoff()
         return result
-    except Exception as e:
-        raise Exception(f"An error occurred while running the crew with trigger: {e}")
+
+
+# main function
+if __name__ == "__main__":
+    print("Initial Print")
+    print("-------------------------------")
+    var1 = input(dedent("""Enter your data file path:  """))
+    var2 = input(dedent("""Enter the columns you want to target: """))

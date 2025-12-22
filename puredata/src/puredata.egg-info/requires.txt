@@ -1,0 +1,8 @@
+crewai==1.7.1
+langchain<2,>=0.3
+langchain-community<2,>=0.3
+langchain-openai==0.2.14
+openai<3,>=1.0
+python-dotenv<2,>=1.0
+pandas<3,>=2.0
+lxml<7,>=5.0

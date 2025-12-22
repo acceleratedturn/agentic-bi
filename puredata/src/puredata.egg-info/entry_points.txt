@@ -1,0 +1,7 @@
+[console_scripts]
+puredata = puredata.main:run
+replay = puredata.main:replay
+run_crew = puredata.main:run
+run_with_trigger = puredata.main:run_with_trigger
+test = puredata.main:test
+train = puredata.main:train

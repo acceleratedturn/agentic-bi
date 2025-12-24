@@ -7,14 +7,14 @@ class Tasks:
     def __tip_section(self):
         return "If you do your BEST WORK, I'll give you a $10,000 commission!"
 
-    def ingest_and_clean_data(self, agent, target_columns, df):
+    def ingest_and_clean_data(self, agent, target_columns, file_path: str):
         return Task(
             description=dedent(
                 f"""
                 ***Task***: Clean up a dataframe to focus on important columns
                 
                 *** Description ***:
-                Ingest the raw data from the following file: {df}.
+                Ingest the raw data from the following filepath: {file_path}.
                 
                 Your primary goal is to extract ONLY the specific metrics or columns requested by the user: {target_columns}.
                 Perform necessary data cleaning which includes:
@@ -24,7 +24,7 @@ class Tasks:
                 4. Removing any unnecessary columns
 
                 **Parameters**:
-                - Raw Dataframe: {df}
+                - Raw Dataframe file path: {file_path}
                 - Columns that need to be kept: {target_columns}
 
                 **Note** {self.__tip_section()}

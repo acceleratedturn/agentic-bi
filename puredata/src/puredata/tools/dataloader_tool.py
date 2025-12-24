@@ -10,6 +10,11 @@ state = DataState()
 # Loads the data into a df
 @tool("Data_Loader")
 def data_loader(file_path:str) -> str:
+    """
+    Load a raw dataset file from disk into a pandas DataFrame.
+    Supported formats include CSV, JSON, XML, and TXT.
+    The loaded DataFrame is stored in shared state for downstream processing.
+    """
     try:
         if not os.path.exists(file_path):
             return f"Error: File not found @ {file_path}"
@@ -29,9 +34,9 @@ def data_loader(file_path:str) -> str:
         
         state.df = df
 
-        return(f"Succesfully loaded data from {file_path}"
-               f"Dataset contains {len(df)} rows and {len(df.columns)} columns"
-               f"Columns available: {', '.join(df.columns)}")
+        return(f"Succesfully loaded data from {file_path}\n"
+               f"Dataset contains {len(df)} rows and {len(df.columns)} columns\n"
+               f"Columns available: {', '.join(df.columns)}\n")
     
     except Exception as e:
         return f"An error occured when loading the file: {str(e)}"
@@ -41,6 +46,11 @@ def data_loader(file_path:str) -> str:
 # Null data removal
 @tool("Data_Cleaner")
 def data_cleaner(columns_needed: list[str]) -> str:
+    """
+    Clean the loaded DataFrame by selecting specified columns,
+    trimming whitespace from column names, handling missing values,
+    and removing duplicate rows.
+    """
     if state.df is None:
         return "Error: No data in memory. Run Data_Loader first."
     try:

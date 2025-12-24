@@ -3,6 +3,7 @@ from textwrap import dedent
 from langchain_openai import OpenAI
 from langchain_community.llms import Ollama
 from langchain_openai import ChatOpenAI
+from puredata.tools.dataloader_tool import data_loader, data_cleaner
 
 
 class DataAgents:
@@ -19,8 +20,7 @@ class DataAgents:
             
             goal=dedent(f""" Create a clean dataframe from an input by Ingesting a raw pandas datafram, performing user-defined cleaning, and transforming it 
                         into a structured, analysis-ready dataframe"""),
-             tools=[
-              ],
+             tools=[ data_loader, data_cleaner ],
             verbose=True,
             llm=self.dataCleaning_OpenAIGPT35,
         )

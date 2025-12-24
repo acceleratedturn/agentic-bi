@@ -7,8 +7,6 @@ from textwrap import dedent
 from .config.agents import DataAgents
 from .tasks import Tasks
 from pathlib import Path
-
-# ✅ add this import so we can access the cleaned dataframe in memory
 from puredata.tools.dataloader_tool import state
 
 
@@ -52,7 +50,6 @@ def getRoot() -> Path:
 if __name__ == "__main__":
     print("Initial Print")
     print("-------------------------------")
-
     filename = input(dedent("""Enter your data file name:  """)).strip()
     rootpath = getRoot()
     FILEPATH = (rootpath / "Datafiles" / "Raw" / filename).resolve()
@@ -60,11 +57,9 @@ if __name__ == "__main__":
 
     columns = input(dedent("""Enter the columns you want to target: """)).strip()
     target_columns = [c.strip() for c in columns.split(",") if c.strip()]
-
     crew = DataCrew(target_columns=target_columns, Data_File_Path=str(FILEPATH))
     result = crew.run()
 
-    # ✅ NEW: show actual row count and save full cleaned dataset
     if state.df is None:
         print("No cleaned dataframe found in memory (state.df is None).")
     else:

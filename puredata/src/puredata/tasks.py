@@ -4,8 +4,6 @@ from textwrap import dedent
 
 
 class Tasks:
-    def __tip_section(self):
-        return "If you do your BEST WORK, I'll give you a $10,000 commission!"
 
     def ingest_and_clean_data(self, agent, target_columns, file_path: str):
         return Task(
@@ -27,7 +25,7 @@ class Tasks:
                 - Raw Dataframe file path: {file_path}
                 - Columns that need to be kept: {target_columns}
 
-                **Note** {self.__tip_section()}
+                
         
                 Use the custom DataLoader tool to process the file efficiently to save on tokens.
                 Ensure the final output is a strictly structured dataset ready for the Data Analyst.
@@ -45,9 +43,6 @@ class Tasks:
                 **Description**: 
                 Review the DataFrame generated in the previous task to ensure it is analysis-ready.
                 Check that the columns match exactly what was requested and that no corruption occurred during the cleaning phase.
-                
-                {self.__tip_section()}
-
                 Prepare a summary report of the cleaning actions taken (e.g., '50 nulls removed', 'column X converted to float').
             """
             ),

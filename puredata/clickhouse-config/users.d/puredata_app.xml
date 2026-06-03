@@ -1,0 +1,22 @@
+<clickhouse>
+  <users>
+    <puredata_app>
+      <password>MyStrongPassword123!</password>
+      <profile>default</profile>
+      <quota>default</quota>
+      <networks>
+        <ip>::/0</ip>
+      </networks>
+      <access_management>1</access_management>
+    </puredata_app>
+
+    <!-- optional: keep default open for local dev -->
+    <default>
+      <password></password>
+      <networks>
+        <ip>::/0</ip>
+      </networks>
+      <access_management>1</access_management>
+    </default>
+  </users>
+</clickhouse>

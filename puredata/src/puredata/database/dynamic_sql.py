@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 import pandas as pd
 import clickhouse_connect
 
-
+# Removes any invalid chars
 def sanitize(name: str) -> str:
     name = name.strip().lower()
     name = re.sub(r"[^a-z0-9_]+", "_", name)
@@ -13,7 +13,7 @@ def sanitize(name: str) -> str:
         name = f"c_{name}"
     return name
 
-
+# Converts data types
 def pandas_to_ch(series: pd.Series) -> str:
     has_nulls = series.isna().any()
     if pd.api.types.is_integer_dtype(series):
@@ -45,7 +45,6 @@ def save_df_as_new_table(df: pd.DataFrame, source_file: str, table_name: str):
     db = os.getenv("CLICKHOUSE_DATABASE", "puredata")
 
     client.command(f"CREATE DATABASE IF NOT EXISTS {db}")
-
     clean_df = df.copy()
     clean_df.columns = [sanitize(c) for c in clean_df.columns]
 
@@ -60,6 +59,7 @@ def save_df_as_new_table(df: pd.DataFrame, source_file: str, table_name: str):
 
     cols = ",\n  ".join(columns_sql)
 
+    # Creates table
     client.command(
         f"""
         CREATE TABLE IF NOT EXISTS {db}.`{table_name}` (

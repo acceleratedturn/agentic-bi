@@ -4,6 +4,7 @@ from langchain_openai import OpenAI
 from langchain_community.llms import Ollama
 from langchain_openai import ChatOpenAI
 from puredata.tools.dataloader_tool import data_loader, data_cleaner
+from puredata.tools.data_analysis_tool import clickhouse_read
 
 
 class DataAgents:
@@ -31,6 +32,7 @@ class DataAgents:
             backstory=dedent(f"""Expert in analyzing data from a pandas dataframe, I have decades of experience with creating reports summarizing data """),
             goal=dedent(f"""Create a report by Exploring the structured data, performing statistical analysis, and
                             generating clear, descriptive reports and visualizations."""),
+            tools=[clickhouse_read], # Update this
             verbose=True,
             llm=self.OpenAIGPT35,
         )
@@ -42,6 +44,7 @@ class DataAgents:
                              making accurate predictions and creating methods that provide a net positive that are also actionable"""),
             goal=dedent(f"""Create a report by applying advanced techniques, making predictions, forecasting, and
                             translating findings into actionable business strategy."""),
+            tools=[ ], # Update this
             verbose=True,
             llm=self.OpenAIGPT35,
             )

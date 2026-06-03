@@ -18,15 +18,16 @@ class DataCrew:
         self.target_columns = target_columns
         self.Data_File_Path = Data_File_Path
 
-    def run(self):
+    def run_ingest(self):
         # agents and tasks imports
         agents = DataAgents()
         tasks = Tasks()
 
         # Agent Definition
         engineer = agents.engineer()
-        analyst = agents.analyst()
-        scientist = agents.scientist()
+        
+        # analyst = agents.analyst()
+        # scientist = agents.scientist()
 
         # Task Defintion
         IngestingData = tasks.ingest_and_clean_data(
@@ -43,6 +44,33 @@ class DataCrew:
         )
         result = crew.kickoff()
         return result
+    
+    def run_analyze(self, database: str, table: str):
+        # agents and tasks imports
+        agents = DataAgents()
+        tasks = Tasks()
+
+        # Agent Definition
+        analyst = agents.analyst()
+        # scientist = agents.scientist()
+
+        # Task Defintion
+        analyze_tasks = tasks.analyze_data_summary(
+            analyst,
+            database = database,
+            table = table,
+            target_columns=self.target_columns,
+        )
+
+        # Crew Definition
+        crew = Crew(
+            agents=[analyst],  # Update all agents here
+            tasks=[analyze_tasks],  # Update Tasks here
+            verbose=True,
+        )
+        result = crew.kickoff()
+        return result
+    
 
 
 def getRoot() -> Path:
@@ -61,38 +89,45 @@ if __name__ == "__main__":
     columns = input(dedent("""Enter the columns you want to target: """)).strip()
     target_columns = [c.strip() for c in columns.split(",") if c.strip()]
     crew = DataCrew(target_columns=target_columns, Data_File_Path=str(FILEPATH))
-    result = crew.run()
+    result = crew.run_ingest()
 
     if state.df is None:
         print("No cleaned dataframe found in memory (state.df is None).")
-    else:
-        print("Rows in cleaned dataframe:", len(state.df))
+        print(result)
+        raise SystemExit(1)
+    
+    print("Rows in cleaned dataframe:", len(state.df))
         
-        # Clickhouse Database Save
-        ts = datetime.now().strftime("%H%M%S") # Time Gen
-        file_stem = Path(filename).stem
+    # Clickhouse Database Save
+    ts = datetime.now().strftime("%H%M%S") # Time Gen
+    file_stem = Path(filename).stem
 
-        # make a readable cols part
-        cols_part = "_".join([c.strip().lower().replace(" ", "_") for c in target_columns]) # replaces spaces with _ for Clickhouse
-        cols_part = re.sub(r"[^a-z0-9_]+", "_", cols_part)
+    # make a readable cols part
+    cols_part = "_".join([c.strip().lower().replace(" ", "_") for c in target_columns]) # replaces spaces with _ for Clickhouse
+    cols_part = re.sub(r"[^a-z0-9_]+", "_", cols_part)
 
-        table_name = f"{file_stem}__{cols_part}__{ts}".lower() # Table Name generation based on Time
+    table_name = f"{file_stem}__{cols_part}__{ts}".lower() # Table Name generation based on Time
 
-        # Dynamic Storage Access
-        ch_info = save_df_as_new_table(
-            df=state.df,
-            source_file=filename,
-            table_name=table_name
-        )
+    # Dynamic Storage Access
+    ch_info = save_df_as_new_table(
+        df=state.df,
+        source_file=filename,
+        table_name=table_name
+    )
 
-        print(f"Saved to ClickHouse: {ch_info['database']}.{ch_info['table']} ({ch_info['rows']} rows)")
-        
-        # Local Save for Clean db (easier analysis)
-        output_dir = rootpath / "Datafiles" / "Clean"
-        output_dir.mkdir(parents=True, exist_ok=True)
-        output_path = output_dir / f"{Path(filename).stem}_clean.csv"
-        state.df.to_csv(output_path, index=False)
+    print(f"Saved to ClickHouse: {ch_info['database']}.{ch_info['table']} ({ch_info['rows']} rows)")
+    
+    # Local Save for Clean db (easier analysis)
+    output_dir = rootpath / "Datafiles" / "Clean"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    output_path = output_dir / f"{Path(filename).stem}_clean.csv"
+    state.df.to_csv(output_path, index=False)
 
-        print(f"Saved cleaned data to: {output_path}")
+    print(f"Saved cleaned data to: {output_path}")
 
+    result_analyze = crew.run_analyze(
+        database=ch_info["database"],
+        table=ch_info["table"],
+    )
     print(result)
+    print(result_analyze)
